@@ -127,7 +127,7 @@ class QForceACN():
         logger.info(requestUrl)
 
         # Make the request
-        response = requests.get(requestUrl, json=json, headers=headers)
+        response = requests.post(requestUrl, json=json, headers=headers)
 
         # Extract the data from the response
         return response.json()
