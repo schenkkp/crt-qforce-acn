@@ -86,7 +86,7 @@ class QForceACN():
         self.access_token = None
 
     @keyword(name="Execute Integration Procedure", tags=['OmniStudio', 'REST API'])
-    def execute_integration_procedure(self, type_subtype, **params):
+    def execute_integration_procedure(self, type_subtype, json=None, **params):
         r"""Executes an OmniStudio Integration Procedure via the Salesforce REST API and returns a JSON string for further processing.
 
         Example
@@ -94,13 +94,18 @@ class QForceACN():
         .. code:: robotframework
 
             ${params}=   Create Dictionary    key1=value1    key2=value2    key3=value3
-            ${result}=   Execute Integration Procedure     Application_GrantMgmt    &{params}
+            ${result}=   Execute Integration Procedure     Application_GrantMgmt    params=&{params}
+
+            ${json}      Load Json From File    testfile.json
+            ${result}=   Execute Integration Procedure     Application_GrantMgmt    json=${json}
 
         Parameters
         ----------
 
         ``type_subtype`` : str
             Type and Subtype of the integration procedure you would like to run, concatenated with an underscore (e.g. Type_SubType)
+        ``json`` : str
+            A json-formatted string to pass into the integration procedure
         ``params`` : dict
             A dictionary of key-value pairs related to the input parameters to pass into the integration procedure
         """
@@ -116,12 +121,13 @@ class QForceACN():
         requestUrl += self.namespace
         requestUrl += '/v1/integrationprocedure/'
         requestUrl += type_subtype
-        requestUrl += '?' + urlencode(params)
+        if params != None:
+            requestUrl += '?' + urlencode(params)
 
         logger.info(requestUrl)
 
         # Make the request
-        response = requests.get(requestUrl, headers=headers)
+        response = requests.get(requestUrl, json=json, headers=headers)
 
         # Extract the data from the response
         return response.json()
